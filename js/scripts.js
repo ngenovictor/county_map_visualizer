@@ -8,3 +8,25 @@ L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_toke
     id: 'mapbox/streets-v11',
     accessToken: apiToken
 }).addTo(countyMap);
+
+var kenyanCountiesLayer;
+
+let xhr = new XMLHttpRequest();
+xhr.open('GET', 'data/kenyan_counties.geojson');
+xhr.setRequestHeader('Content-Type', 'application/json');
+xhr.responseType = 'json';
+xhr.onload = function() {
+    if (xhr.status !== 200) return
+    var kenyanCountiesLayer = L.geoJSON(xhr.response,{
+        style: {
+            "color": "#ff7800",
+            "weight": 2,
+            "opacity": 0.65
+        },
+        onEachFeature: function(feature, layer){
+            layer.bindPopup(feature.properties.ADM1_EN);
+        }
+    }).addTo(countyMap);
+    countyMap.fitBounds(kenyanCountiesLayer.getBounds());
+};
+xhr.send();
